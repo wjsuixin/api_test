@@ -16,11 +16,14 @@ class RunMain:
         """
         index = int(handle_ini.get_value("index","SheetIndex"))
         rows=handle_excel.getRows(index)
+        col_result = int(handle_ini.get_value("result"))
+        col_res = int(handle_ini.get_value("response"))
         for i in range(rows-1): # 由于读取到sheet的数据行为rows,存在1行标题行，故有效数据循环遍历的次数为row-1
+            handle_excel.writeData(i+2,col_result,"",index)# 初始化，将上次执行结果删除
+            handle_excel.writeData(i+2,col_res,"",index)
             data=handle_excel.getRowValue(i+2,index) # 第一条有效数据实际行数为2，i取值是从0开始的，故使用i+2
             print(data)
             depend=data[int(handle_ini.get_value("depend"))-1]
-            print(int(handle_ini.get_value("depend"))-1)
             method=data[int(handle_ini.get_value("method"))-1]
             url=data[int(handle_ini.get_value("url"))-1]
             re_data=data[int(handle_ini.get_value("data"))-1]
@@ -29,8 +32,6 @@ class RunMain:
             token_operate=data[int(handle_ini.get_value("token_operate"))-1]
             expected_method=data[int(handle_ini.get_value("expected_method"))-1]
             expected_result=str(data[int(handle_ini.get_value("expected_result"))-1])
-            col_result = int(handle_ini.get_value("result"))
-            col_res = int(handle_ini.get_value("response"))
             if is_run=="yes" or is_run=="Yes":
                 if depend!=None:
                     if depend.find(",")==-1:

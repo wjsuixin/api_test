@@ -1,4 +1,5 @@
 import json
+import jsonpath
 from util.handle_excel import handle_excel
 from jsonpath_rw import parse
 from util.handle_ini import handle_ini
@@ -80,12 +81,13 @@ if __name__ == '__main__':
     data="case_001>data.token"
     data1="case_001>data.token,case_001>data"
     data2 = "case_001>data"
-    #print(spilt_data(data))
-    #d=depend_data(data)
-    #print(type(json.loads(d)))
+    #print(split_data(data))
     #print(split_key(data2))
-    data3={"111":111}
-    print(generated_datas(data1,data3))
+    #data3={"111":111}
+    #print(generated_datas(data1,data3))
+    print(depend_data(data))
+    print(type(json.loads(depend_data(data))))
+    print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
 
 
 
