@@ -1,5 +1,3 @@
-import json
-import os
 from deepdiff import DeepDiff
 
 def handle_result_json(dict1,dict2):
