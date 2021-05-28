@@ -5,6 +5,7 @@ from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
 from util.condition_data import generated_data,generated_datas
 from util.handle_header import write_token,updata_header
+from util.handle_result_json import handle_result_json
 
 class RunMain:
     """
@@ -44,6 +45,7 @@ class RunMain:
                     else:
                         header = updata_header(header)
                     res=base_request.run_main(method,index,url,re_data,header)
+                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
@@ -64,9 +66,21 @@ class RunMain:
                             print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res),index)
+                    if expected_method == "json":
+                        expected_result = json.loads(expected_result)
+                        result=handle_result_json(res,expected_result)
+                        if result:
+                            print("预期结果校验方式的结果与实际结果一致,该用例测试通过")
+                            handle_excel.writeData(i + 2, col_result, "pass", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
+                        else:
+                            print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
+                            handle_excel.writeData(i + 2, col_result, "fail", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
                 elif token_operate=="write_token":
                     header=eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
+                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
@@ -89,6 +103,17 @@ class RunMain:
                             print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res),index)
+                    if expected_method == "json":
+                        expected_result = json.loads(expected_result)
+                        result=handle_result_json(res,expected_result)
+                        if result:
+                            print("预期结果校验方式的结果与实际结果一致,该用例测试通过")
+                            handle_excel.writeData(i + 2, col_result, "pass", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
+                        else:
+                            print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
+                            handle_excel.writeData(i + 2, col_result, "fail", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
                 else:
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
@@ -112,6 +137,17 @@ class RunMain:
                             print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res),index)
+                    if expected_method == "json":
+                        expected_result = json.loads(expected_result)
+                        result=handle_result_json(res,expected_result)
+                        if result:
+                            print("预期结果校验方式的结果与实际结果一致,该用例测试通过")
+                            handle_excel.writeData(i + 2, col_result, "pass", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
+                        else:
+                            print("预期结果校验方式的结果与实际结果不一致,该用例执行失败")
+                            handle_excel.writeData(i + 2, col_result, "fail", index)
+                            handle_excel.writeData(i + 2, col_res, json.dumps(res), index)
 
 if __name__ == '__main__':
     run_case=RunMain()
