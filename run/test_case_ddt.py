@@ -13,7 +13,9 @@ from util.handle_header import write_token
 from util.handle_header import updata_header
 from BeautifulReport import BeautifulReport
 from util.handle_result_json import handle_result_json
-sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
+base_path=os.path.dirname(os.path.dirname(__file__))
+
+sys.path.append(base_path)
 
 index = int(handle_ini.get_value("index", "SheetIndex"))
 request_data = []

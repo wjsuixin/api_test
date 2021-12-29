@@ -2,7 +2,7 @@ import configparser
 import os,sys
 from util.handle_excel import handle_excel
 base_path=os.path.dirname(os.path.dirname(__file__))
-sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
+sys.path.append(base_path)
 class HandleIni:
 
     def load_ini(self,file_path=None):

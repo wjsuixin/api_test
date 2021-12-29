@@ -7,7 +7,8 @@ from util.handle_ini import handle_ini
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 base_path=os.path.dirname(os.path.dirname(__file__))
-sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
+
+sys.path.append(base_path)
 
 class BaseRequest:
 

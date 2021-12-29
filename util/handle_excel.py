@@ -1,10 +1,12 @@
 import openpyxl
-import os,json
+import os,json,sys
 import datetime
-base_path = os.path.dirname(os.getcwd())
+base_path=os.path.dirname(os.path.dirname(__file__))
 file_path = base_path+"/data/Test_case.xlsx"
 now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
 new_file_path=base_path+"\report\%s.xlsx" % now
+
+sys.path.append(base_path)
 
 class HandleExcel():
     """
