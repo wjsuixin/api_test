@@ -1,9 +1,8 @@
 import openpyxl
-import os
+import os,json
 import datetime
-
 base_path = os.path.dirname(os.getcwd())
-file_path = base_path + "\data\Test_case.xlsx"
+file_path = base_path+"/data/Test_case.xlsx"
 now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
 new_file_path=base_path+"\report\%s.xlsx" % now
 
@@ -11,31 +10,29 @@ class HandleExcel():
     """
     定义一个操作Excel数据表的类
     """
-    def loadExcel(self,file_path=None):
+    def loadExcel(self):
         """
         打开Excel数据表
         """
-        if file_path==None:
-            file_path=base_path + "\data\Test_case.xlsx"
         open_excel=openpyxl.load_workbook(file_path)
         return open_excel
 
-    def get_sheet_names(self,file_path=None):
+    def get_sheet_names(self):
         """
         获取sheetname集合
         """
-        sheet_names=self.loadExcel(file_path).sheetnames
+        sheet_names=self.loadExcel().sheetnames
         return sheet_names
 
-    def getSheetData(self,index=None,file_path=None):
+    def getSheetData(self,index=None):
         """
         加载Excel表的sheet
         """
-        sheet_names=self.loadExcel(file_path).sheetnames
+        sheet_names=self.loadExcel().sheetnames
         #print(sheet_names)
         if index==None:
             index=0
-        data=self.loadExcel(file_path)[sheet_names[index]]
+        data=self.loadExcel()[sheet_names[index]]
         return data
 
     def getCellValue(self,row,cols,index=None):
@@ -112,16 +109,16 @@ class HandleExcel():
         open_excel.save(new_file_path)
         return "新建Excel成功，文件名路径：%s" % new_file_path
 
-
-
-
-
 handle_excel=HandleExcel()
 
 if __name__ == '__main__':
     handle_excel=HandleExcel()
-    #print(handle_excel.getExcelData(0))
-    print(handle_excel.get_sheet_names())
+    data=handle_excel.getCellValue(2,7)
+    print(data)
+    if data.find("####")!=-1:
+        print(data.replace("####","daad"))
+
+
 
 
 

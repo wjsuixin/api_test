@@ -17,8 +17,10 @@ def depend_data(data):
     获取到所依赖数据集合,返回case_num对应接口返回的数据
     """
     case_num=split_data(data)[0]
+    #print("依赖的数据的case_num:{}".format(case_num))
     row=handle_excel.getRowsNumber(case_num)
     col_res=int(handle_ini.get_value("response"))
+    #print("根据依赖case_num:{},获取到的依赖case返回数据：{}".format(case_num,handle_excel.getCellValue(row,col_res)))
     return handle_excel.getCellValue(row,col_res)
 
 def get_depend_data(res_data,key):
@@ -36,6 +38,7 @@ def get_data(data):
     """
     res_data=depend_data(data) # 返回依赖数据集合
     rule_data=split_data(data)[1] # 返回切割后的依赖key
+    #print("根据获取到的case依赖返回数据：{}，以及rule_data：{}，获取到依赖值：{}".format(res_data,rule_data,get_depend_data(res_data,rule_data)))
     return get_depend_data(res_data,rule_data)
 
 def split_key(data):
@@ -63,7 +66,7 @@ def generated_data(data,sent_data=None):
 
 def generated_datas(data,sent_data=None):
     """
-    存在多个依赖数据时，循环合成新的数据
+    存在多个依赖数据时，将取到的依赖数据循环合成新的数据，进行传输
     """
     if sent_data==None:
         temp_data = {}
@@ -75,6 +78,7 @@ def generated_datas(data,sent_data=None):
         for i in data.split(","):
             for key,value in generated_data(i).items():
                 temp_data[key]=value
+    #print("组合依赖数据值后生成的新data:{}".format(temp_data))
     return temp_data
 
 if __name__ == '__main__':
@@ -83,11 +87,11 @@ if __name__ == '__main__':
     data2 = "case_001>data"
     #print(split_data(data))
     #print(split_key(data2))
-    #data3={"111":111}
-    #print(generated_datas(data1,data3))
-    print(depend_data(data))
-    print(type(json.loads(depend_data(data))))
-    print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
+    data3={"111":111}
+    generated_datas(data1,data3)
+    #depend_data(data)
+    #print(type(json.loads(depend_data(data))))
+    #print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
 
 
 

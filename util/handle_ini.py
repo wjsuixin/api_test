@@ -11,7 +11,6 @@ class HandleIni:
         """
         if file_path==None:
             file_path=os.path.join(base_path,"config/Base_conf.ini")
-        #print(file_path)
         conf=configparser.ConfigParser() # 将对象实例化
         conf.read(file_path,encoding="utf-8") # 读取ini文件
         return conf

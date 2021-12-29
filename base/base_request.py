@@ -6,8 +6,6 @@ from util.handle_ini import handle_ini
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 base_path=os.path.dirname(os.path.dirname(__file__))
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class BaseRequest:
 
@@ -63,4 +61,16 @@ base_request=BaseRequest()
 
 if __name__ == '__main__':
     base_request=BaseRequest()
-    print(base_request.get_base_url(2))
+    url="https://fat-adm-api.local.hiseas.com/admin/api/auth/login"
+    data={"username":"wj@qq.com","password":"yx1234"}
+    header = {"content-type": "application/json;charset=UTF-8"}
+    res=requests.post(url=url,json=data,headers=header)
+    print(res)
+    header1={"authorization":res.json()["data"]["token"]}
+    print(header1)
+    url1="https://fat-adm-api.local.hiseas.com/admin/api/base/upload"
+    file={"file":("python.pdf",open("D:\python.pdf","rb"),"application/pdf")}
+    files={'file': ("python.pdf", open("D:\python.pdf", 'rb'), "application/pdf")}
+    print(type(file))
+    res1=requests.post(url=url1,files=file,headers=header1,verify=False)
+    print(res1.text)

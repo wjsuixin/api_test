@@ -3,6 +3,7 @@ import json
 import ddt
 import unittest
 import os
+import datetime
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
@@ -11,7 +12,6 @@ from util.condition_data import generated_datas
 from util.handle_header import write_token
 from util.handle_header import updata_header
 from BeautifulReport import BeautifulReport
-import datetime
 from util.handle_result_json import handle_result_json
 
 index = int(handle_ini.get_value("index", "SheetIndex"))
