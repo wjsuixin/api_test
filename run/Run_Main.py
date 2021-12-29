@@ -1,12 +1,14 @@
 #encoding=UTF-8
-import json,os,logging
+import json,os,logging,sys
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
 from util.condition_data import generated_data,generated_datas
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
+base_path=os.path.dirname(os.path.dirname(__file__))
 
+sys.path.append(base_path)
 class RunMain:
     """
     执行case的类
