@@ -1,9 +1,9 @@
-import os
+import os,sys
 from util.handle_ini import handle_ini
 from util.handle_excel import handle_excel
 base_path=os.path.dirname(os.path.dirname(__file__))
 file_path=os.path.join(base_path,"config/header.ini")
-
+sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
 def get_token(data):
     """
     获取token值

@@ -2,7 +2,7 @@
 import json
 import ddt
 import unittest
-import os
+import os,sys
 import datetime
 from base.base_request import base_request
 from util.handle_excel import handle_excel
@@ -13,6 +13,7 @@ from util.handle_header import write_token
 from util.handle_header import updata_header
 from BeautifulReport import BeautifulReport
 from util.handle_result_json import handle_result_json
+sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
 
 index = int(handle_ini.get_value("index", "SheetIndex"))
 request_data = []

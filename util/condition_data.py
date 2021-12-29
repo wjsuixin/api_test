@@ -1,9 +1,10 @@
 import json
+import sys
 import jsonpath
 from util.handle_excel import handle_excel
 from jsonpath_rw import parse
 from util.handle_ini import handle_ini
-
+sys.path.append(r"C:\ProgramData\Jenkins\.jenkins\workspace\api_test")
 def split_data(data):
     """
     获取依赖数据规则并分离出case_num,rule_data
