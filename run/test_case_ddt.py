@@ -23,7 +23,6 @@ for n in handle_excel.getExcelData(index):
     n[-1]=None
     n[-2]=None
     request_data.append(n)
-print(request_data)
 
 @ddt.ddt
 class TestRunCaseDdt(unittest.TestCase):
