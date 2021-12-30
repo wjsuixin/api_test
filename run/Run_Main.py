@@ -35,6 +35,7 @@ class RunMain:
             token_operate=data[int(handle_ini.get_value("token_operate"))-1]
             expected_method=data[int(handle_ini.get_value("expected_method"))-1]
             expected_result=str(data[int(handle_ini.get_value("expected_result"))-1])
+            print(depend)
             if is_run=="yes" or is_run=="Yes":
                 if depend=="否":
                     depend=None

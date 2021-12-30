@@ -50,11 +50,18 @@ class TestRunCaseDdt(unittest.TestCase):
         i = handle_excel.getRowsNumber(case_num,index)
         if is_run == "yes" or is_run == "Yes":
             try:
-                if depend != None:
-                    if depend.find(",") == -1:
-                        re_data = generated_data(depend,re_data)
-                    else:
-                        re_data = generated_datas(depend,re_data)
+                if depend=="否":
+                    depend=None
+                if header=="\\":
+                    header=None
+                if depend!=None:
+                    if re_data=="\\":
+                        re_data=None
+                    if depend != None:
+                        if depend.find(",") == -1:
+                            re_data = generated_data(depend,re_data)
+                        else:
+                            re_data = generated_datas(depend,re_data)
                 if token_operate == "with_token":
                     if header == None:
                         header = updata_header()
@@ -93,7 +100,6 @@ class TestRunCaseDdt(unittest.TestCase):
                             handle_excel.writeData(i,col_result,"fail",index)
                             handle_excel.writeData(i,col_res,json.dumps(res),index)
                             raise e
-
                 elif token_operate == "write_token":
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
@@ -104,20 +110,20 @@ class TestRunCaseDdt(unittest.TestCase):
                             self.assertEqual(code, expected_result)
                             write_token(res)
                             handle_excel.writeData(i,col_result,"pass",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         except Exception as e:
                             handle_excel.writeData(i,col_result,"fail",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                             raise e
                     if expected_method == "msg":
                         try:
                             self.assertEqual(msg,expected_result)
                             write_token(res)
                             handle_excel.writeData(i,col_result,"pass",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         except Exception as e:
                             handle_excel.writeData(i,col_result,"fail",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                             raise e
                     if expected_method=="json":
                         expected_result = json.loads(expected_result)
@@ -126,10 +132,10 @@ class TestRunCaseDdt(unittest.TestCase):
                             self.assertTrue(result)
                             write_token(res)
                             handle_excel.writeData(i, col_result, "pass", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         except Exception as e:
                             handle_excel.writeData(i,col_result,"fail",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                             raise e
                 else:
                     header = eval(header)
@@ -141,19 +147,19 @@ class TestRunCaseDdt(unittest.TestCase):
                         try:
                             self.assertEqual(code, expected_result)
                             handle_excel.writeData(i, col_result, "pass", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         except Exception as e:
                             handle_excel.writeData(i, col_result, "fail", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                             raise e
                     if expected_method == "msg":
                         try:
                             self.assertEqual(msg, expected_result)
                             handle_excel.writeData(i, col_result, "pass", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         except Exception as e:
                             handle_excel.writeData(i, col_result, "fail", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                             raise e
                     if expected_method=="json":
                         expected_result = json.loads(expected_result)
@@ -161,10 +167,10 @@ class TestRunCaseDdt(unittest.TestCase):
                         try:
                             self.assertTrue(result)
                             handle_excel.writeData(i, col_result, "pass", index)
-                            handle_excel.writeData(i, col_res, json.dumps(res), index)
+                            handle_excel.writeData(i, col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         except Exception as e:
                             handle_excel.writeData(i,col_result,"fail",index)
-                            handle_excel.writeData(i,col_res,json.dumps(res),index)
+                            handle_excel.writeData(i,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                             raise e
             except Exception as e:
                 handle_excel.writeData(i, col_result, "fail", index)
@@ -174,8 +180,10 @@ class TestRunCaseDdt(unittest.TestCase):
 if __name__ == '__main__':
     base_path = os.path.dirname(os.getcwd()).replace('\\', '/')
     case_path=base_path+"/run"
+    print(case_path)
     report_path=base_path+"/report"
-    discover = unittest.defaultTestLoader.discover(case_path, 'test*.py', None)
+    print(report_path)
+    discover = unittest.defaultTestLoader.discover(case_path, pattern='test*.py')
     now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
     filename = 'yohitrip interface_' + str(now)
     BeautifulReport(discover).report(description='yohitrip interface test', filename=filename, report_dir=report_path)

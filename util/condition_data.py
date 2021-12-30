@@ -5,14 +5,15 @@ from util.handle_excel import handle_excel
 from jsonpath_rw import parse
 from util.handle_ini import handle_ini
 base_path=os.path.dirname(os.path.dirname(__file__))
-
 sys.path.append(base_path)
+
 def split_data(data):
     """
     获取依赖数据规则并分离出case_num,rule_data
     """
     case_num=data.split(">")[0]
     rule_data=data.split(">")[1]
+    print(data.split(">"))
     return case_num,rule_data
 
 def depend_data(data):
@@ -88,13 +89,13 @@ if __name__ == '__main__':
     data="case_001>data.token"
     data1="case_001>data.token,case_001>data"
     data2 = "case_001>data"
-    #print(split_data(data))
-    #print(split_key(data2))
+    print(split_data(data))
+    print(split_key(data2))
     data3={"111":111}
     generated_datas(data1,data3)
-    #depend_data(data)
-    #print(type(json.loads(depend_data(data))))
-    #print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
+    depend_data(data)
+    print(type(json.loads(depend_data(data))))
+    print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
 
 
 
