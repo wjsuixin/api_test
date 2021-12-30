@@ -180,9 +180,7 @@ class TestRunCaseDdt(unittest.TestCase):
 if __name__ == '__main__':
     base_path = os.path.dirname(os.getcwd()).replace('\\', '/')
     case_path=base_path+"/run"
-    print(case_path)
     report_path=base_path+"/report"
-    print(report_path)
     discover = unittest.defaultTestLoader.discover(case_path, pattern='test*.py')
     now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
     filename = 'yohitrip interface_' + str(now)
