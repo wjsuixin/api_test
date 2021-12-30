@@ -48,6 +48,7 @@ class TestRunCaseDdt(unittest.TestCase):
         col_result = int(handle_ini.get_value("result"))
         col_res = int(handle_ini.get_value("response"))
         i = handle_excel.getRowsNumber(case_num,index)
+        print(f"本次执行的测试用例为：{request_data}")
         if is_run == "yes" or is_run == "Yes":
             try:
                 if depend=="否":
@@ -68,7 +69,6 @@ class TestRunCaseDdt(unittest.TestCase):
                     else:
                         header = updata_header(header)
                     res = base_request.run_main( method, index, url, re_data, header)
-                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
@@ -140,7 +140,6 @@ class TestRunCaseDdt(unittest.TestCase):
                 else:
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
-                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
