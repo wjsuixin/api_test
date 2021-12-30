@@ -176,7 +176,7 @@ class TestRunCaseDdt(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    base_path = os.path.dirname(os.getcwd()).replace('\\', '/')
+    base_path = os.path.dirname(os.path.dirname(__file__)).replace('\\', '/')
     case_path=base_path+"/run"
     report_path=base_path+"/report"
     discover = unittest.defaultTestLoader.discover(case_path, pattern='test*.py')
