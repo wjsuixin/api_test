@@ -91,21 +91,7 @@ def generated_data(data,sql=None,sent_data=None):
 
 def generated_datas(data,sql=None,sent_data=None):
     """
-    存在多个依赖数据时，将取到的依赖数据循环合成新的数据，进行传输
-    """
-    """
-    if sent_data==None:
-        temp_data = {}
-        for i in data.split(","):
-            for key,value in generated_data(i).items():
-                temp_data[key]=value
-    else:
-        temp_data=sent_data
-        for i in data.split(","):
-            for key,value in generated_data(i).items():
-                temp_data[key]=value
-    #print("组合依赖数据值后生成的新data:{}".format(temp_data))
-    return temp_data
+    将取到的依赖数据循环合成新的数据，进行传输
     """
     if data.find("&")==-1: # 判断是否是多数据依赖
         if split_data(data)[0].find("sql#") == -1:  # 判断是否是case依赖
@@ -148,6 +134,7 @@ if __name__ == '__main__':
     data="case_001>data.token"
     data1="case_001>data.(id,name),case_001>data"
     data2 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}&sql#yanxue_common_fat>{'alternativeSupplierId':'id','alternativeSupplierName':'name'}"
+    data4 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}&case_001>data.token$.data.token"
     #print(split_data(data))
     #print(split_key(data2))
     data3={"data":{
@@ -162,7 +149,7 @@ if __name__ == '__main__':
 
     #print(depend_data(data6,sql))
     #print(split_key(data2))
-    print(generated_datas(data2,sql=sql,sent_data=data3))
+    print(generated_datas(data4,sql=sql,sent_data=data3))
     data7={'supplierId': 545, 'supplierName': '丁天测试银行账户', 'alternativeSupplierId': 534, 'alternativeSupplierName': '头发公司时代风格'}
     #print(dict(data3["data"]["customer"],**data7))
 
