@@ -64,6 +64,7 @@ base_request=BaseRequest()
 
 if __name__ == '__main__':
     base_request=BaseRequest()
+    """
     url="https://fat-adm-api.local.hiseas.com/admin/api/auth/login"
     data={"username":"wj@qq.com","password":"yx1234"}
     header = {"content-type": "application/json;charset=UTF-8"}
@@ -77,3 +78,5 @@ if __name__ == '__main__':
     print(type(file))
     res1=requests.post(url=url1,files=file,headers=header1,verify=False)
     print(res1.text)
+    """
+    base_request.get_base_url(1)

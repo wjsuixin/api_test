@@ -34,3 +34,8 @@ def updata_header(header=None):
     except:
         header=None
     return header
+
+if __name__ == '__main__':
+    headers={"content-type":"application/json;charset=UTF-8"}
+    print(type(headers))
+    print(updata_header(headers))

@@ -6,6 +6,7 @@ from util.handle_ini import handle_ini
 from util.condition_data import generated_data,generated_datas
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
+from util.handle_yaml import handle_yaml
 base_path=os.path.dirname(os.path.dirname(__file__))
 
 sys.path.append(base_path)
@@ -26,6 +27,8 @@ class RunMain:
             handle_excel.writeData(i+2,col_result,"",index)# 初始化，将上次执行结果删除
             handle_excel.writeData(i+2,col_res,"",index)
             data=handle_excel.getRowValue(i+2,index) # 第一条有效数据实际行数为2，i取值是从0开始的，故使用i+2
+            case_num =data[int(handle_ini.get_value("case_num"))-1]
+            print(case_num)
             depend=data[int(handle_ini.get_value("depend"))-1]
             method=data[int(handle_ini.get_value("method"))-1]
             url=data[int(handle_ini.get_value("url"))-1]
@@ -35,7 +38,6 @@ class RunMain:
             token_operate=data[int(handle_ini.get_value("token_operate"))-1]
             expected_method=data[int(handle_ini.get_value("expected_method"))-1]
             expected_result=str(data[int(handle_ini.get_value("expected_result"))-1])
-            print(depend)
             if is_run=="yes" or is_run=="Yes":
                 if depend=="否":
                     depend=None
@@ -49,7 +51,10 @@ class RunMain:
                     else:
                         re_data=generated_datas(depend,re_data)
                 if token_operate == "with_token":
-                    header = updata_header(header)
+                    if header==None:
+                        header = updata_header(header)
+                    else:
+                        header = updata_header(eval(header))
                     res=base_request.run_main(method,index,url,re_data,header)
                     print(res)
                     code = res["code"]

@@ -102,6 +102,7 @@ class TestRunCaseDdt(unittest.TestCase):
                 elif token_operate == "write_token":
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
+                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
