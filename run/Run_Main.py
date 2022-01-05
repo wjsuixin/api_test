@@ -3,7 +3,7 @@ import json,os,logging,sys
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
-from util.condition_data import generated_data,generated_datas
+from util.condition_data import generated_datas
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
 from util.handle_yaml import handle_yaml
@@ -20,7 +20,6 @@ class RunMain:
         """
         index = int(handle_ini.get_value("index","SheetIndex"))
         rows=handle_excel.getRows(index)
-
         col_result = int(handle_ini.get_value("result"))
         col_res = int(handle_ini.get_value("response"))
         for i in range(rows-1): # 由于读取到sheet的数据行为rows,存在1行标题行，故有效数据循环遍历的次数为row-1
@@ -44,12 +43,16 @@ class RunMain:
                 if header=="\\":
                     header=None
                 if depend!=None:
+                    sql=handle_yaml.get_data("yanxue_ERP","/config/depend_sql.yaml")[case_num]
+                    print(sql)
                     if re_data=="\\":
                         re_data=None
-                    if depend.find(",")==-1:
-                        re_data=generated_data(depend,re_data)
                     else:
-                        re_data=generated_datas(depend,re_data)
+                        if type(generated_datas(depend,sent_data=re_data,sql=sql))==str:
+                            re_data=bytes(generated_datas(depend,sent_data=re_data,sql=sql).encode('utf-8'))
+                        else:
+                            re_data = generated_datas(depend, sent_data=re_data, sql=sql)
+                    print(re_data)
                 if token_operate == "with_token":
                     if header==None:
                         header = updata_header(header)
@@ -126,6 +129,7 @@ class RunMain:
                             handle_excel.writeData(i + 2, col_result, "fail", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 else:
+                    print(header)
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
                     print(res)

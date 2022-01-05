@@ -1,3 +1,4 @@
+#encoding=utf-8
 import json
 import sys,os
 import jsonpath
@@ -11,11 +12,16 @@ sys.path.append(base_path)
 
 def split_data(data):
     """
-    获取依赖数据规则并分离出case_num/sql,rule_data
+    获取依赖数据规则并分离出case_num/sql,rule_data,replace_value
     """
     case_num=data.split(">")[0]
-    rule_data=data.split(">")[1]
-    return case_num,rule_data
+    if data.split(">")[1].find("@")!=-1:
+        rule_data=data.split(">")[1].split("@")[0]
+        replace_value=data.split(">")[1].split("@")[1]
+    else:
+        rule_data = data.split(">")[1]
+        replace_value =None
+    return case_num,rule_data,replace_value
 
 def depend_data(data,sql=None):
     """
@@ -31,8 +37,10 @@ def depend_data(data,sql=None):
     else:
         depend_database=split_data(data)[0].split("#")[1]
         depend_type=split_data(data)[0].split("#")[0]
-        if depend_type=="sql":
+        if depend_type=="sql" and sql!=None:
             return random.choice(HandleSQl(depend_database).query(sql))
+        else:
+            print("sql依赖的case,请检查依赖数据是否正确或者sql语句是否传递！")
 
 
 def get_depend_data(res_data,key):
@@ -67,28 +75,6 @@ def split_key(data):
         routine_list.append(rule_data)
     return routine_list[-1]
 
-def generated_data(data,sql=None,sent_data=None):
-    """
-    将路径提取的值与分割的路径名，合成新的k=value数据
-    """
-    if split_data(data)[0].find("sql#") == -1:#判断是否是case依赖
-        if sent_data==None:
-            sent_data={split_key(data):get_data(data)}
-        else:
-            sent_data[split_key(data)]=get_data(data)
-    else:
-        old_data=depend_data(data,sql)
-        depend=eval(split_key(data))
-        for key1,value in depend.items():
-            for key2 in old_data.keys():
-                if depend[key1]==key2:
-                    depend[key1]=old_data[key2]
-        if sent_data == None:
-            sent_data = depend
-        else:
-            sent_data=dict(sent_data,**depend)
-    return sent_data
-
 def generated_datas(data,sql=None,sent_data=None):
     """
     将取到的依赖数据循环合成新的数据，进行传输
@@ -96,45 +82,82 @@ def generated_datas(data,sql=None,sent_data=None):
     if data.find("&")==-1: # 判断是否是多数据依赖
         if split_data(data)[0].find("sql#") == -1:  # 判断是否是case依赖
             if sent_data == None:
-                sent_data = {split_key(data): get_data(data)}
+                print("传递参数为空，依赖值无可替换的key,请检查！")
             else:
-                sent_data[split_key(data)] = get_data(data)
+                if split_data(data)[2] == None:
+                    print("该用例为case依赖，缺少替换值参数的依赖值的key")
+                else:
+                    if sent_data.find(split_data(data)[2]) != -1:
+                        if type(get_data(data))==dict:
+                            sent_data = sent_data.replace(split_data(data)[2],json.dumps(get_data(data)))
+                        else:
+                            sent_data = sent_data.replace(split_data(data)[2], get_data(data))
+                    else:
+                        print("用例依赖替换值与参数中的替换值不一致或参数中替换值缺失，请检查！")
         else:
             old_data = depend_data(data, sql)
-            depend = eval(split_key(data))
+            depend = eval(split_data(data)[1])
             for key1, value in depend.items():
                 for key2 in old_data.keys():
                     if depend[key1] == key2:
                         depend[key1] = old_data[key2]
             if sent_data == None:
-                sent_data = depend
+                if split_data(data)[2] == None:
+                    sent_data = depend
+                else:
+                    print("参数为空，此时无法替换依赖值！")
             else:
-                sent_data = dict(sent_data, **depend)
+                if split_data(data)[2] == None:
+                    sent_data = dict(eval(sent_data), **depend)
+                else:
+                    if sent_data.find(split_data(data)[2]) != -1:
+                        sent_data = sent_data.replace(split_data(data)[2], json.dumps(depend))
+                    else:
+                        print("sql依赖值的替换值与参数中的不一致，请检查用例！")
     else:
         for i in data.split("&"):
             if split_data(i)[0].find("sql#") == -1:  # 判断是否是case依赖
                 if sent_data == None:
-                    sent_data = {split_key(i): get_data(i)}
+                    print("传递参数为空，依赖值无可替换的key,请检查！")
                 else:
-                    sent_data[split_key(i)] = get_data(i)
+                    if split_data(i)[2] == None:
+                        print("该用例为case依赖，缺少替换值参数的依赖值的key")
+                    else:
+                        if sent_data.find(split_data(i)[2]) != -1:
+                            if type(get_data(i)) == dict:
+                                sent_data = sent_data.replace(split_data(i)[2], json.dumps(get_data(i)))
+                            else:
+                                sent_data = sent_data.replace(split_data(i)[2], get_data(i))
+                        else:
+                            print("用例依赖替换值与参数中的替换值不一致或参数中替换值缺失，请检查！")
             else:
                 old_data = depend_data(i, sql)
-                depend = eval(split_key(i))
+                depend = eval(split_data(i)[1])
                 for key1, value in depend.items():
                     for key2 in old_data.keys():
                         if depend[key1] == key2:
                             depend[key1] = old_data[key2]
                 if sent_data == None:
-                    sent_data = depend
+                    if split_data(i)[2] == None:
+                        sent_data = depend
+                    else:
+                        print("参数为空，此时无法替换依赖值！")
                 else:
-                    sent_data = dict(sent_data, **depend)
+                    if split_data(data)[2] == None:
+                        sent_data = dict(eval(sent_data), **depend)
+                    else:
+                        if sent_data.find(split_data(i)[2]) != -1:
+                            sent_data = sent_data.replace(split_data(i)[2], json.dumps(depend))
+                        else:
+                            print("sql依赖值的替换值与参数中的不一致，请检查用例！")
     return sent_data
 
 if __name__ == '__main__':
     data="case_001>data.token"
     data1="case_001>data.(id,name),case_001>data"
-    data2 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}&sql#yanxue_common_fat>{'alternativeSupplierId':'id','alternativeSupplierName':'name'}"
-    data4 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}&case_001>data.token$.data.token"
+    data2 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}@#name1#&sql#yanxue_common_fat>{'alternativeSupplierId':'id','alternativeSupplierName':'name'}@#name2#&case_001>data.token#token#"
+    data21 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}"
+    data4 = "sql#yanxue_common_fat>{'supplierId':'id','supplierName':'name'}&case_001>data.token"
     #print(split_data(data))
     #print(split_key(data2))
     data3={"data":{
@@ -144,14 +167,26 @@ if __name__ == '__main__':
     depend_data(data)
     #print(type(json.loads(depend_data(data))))
     #print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
-    data6='sql#yanxue_common_fat>{"supplierId":id,"supplierName":name}'
+    data6='sql#yanxue_common_fat>{"supplierId":"id","supplierName":"name"}@#name1#'
     sql = "SELECT id,name FROM `yx_common_fat`.`supplier` WHERE `audit_status` = '3' AND `enable_status` LIKE '%1%' LIMIT 0,1000"
 
     #print(depend_data(data6,sql))
     #print(split_key(data2))
-    print(generated_datas(data4,sql=sql,sent_data=data3))
+    #print(generated_datas(data4,sql=sql,sent_data=data3))
     data7={'supplierId': 545, 'supplierName': '丁天测试银行账户', 'alternativeSupplierId': 534, 'alternativeSupplierName': '头发公司时代风格'}
     #print(dict(data3["data"]["customer"],**data7))
+    data8='{"name":"#name1#","status":1,"code":"#name2#","pageNo":1,"pageSize":10,"token":"#token#"}'
+    data9='case_001>data.customer.cityName@#name1#&case_001>data.token@#token#&sql#yanxue_common_fat>{"supplierId":"id","supplierName":"name"}@#name2#'
+    data91 = "case_001>data.name"
+    #print(depend_data(data2,sql=sql))
+    #print(get_data(data9))
+    print(generated_datas(data9,sent_data=data8,sql=sql))
+    #print(data8.replace(split_data(data9)[2], get_data(data9)))
+
+
+
+
+
 
 
 
