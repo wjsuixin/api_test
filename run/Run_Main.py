@@ -1,15 +1,14 @@
 #encoding=UTF-8
-import json,os,logging,sys
+import json,os,sys
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
 from util.condition_data import generated_datas
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
-from util.handle_yaml import handle_yaml
 base_path=os.path.dirname(os.path.dirname(__file__))
-
 sys.path.append(base_path)
+
 class RunMain:
     """
     执行case的类
@@ -26,7 +25,6 @@ class RunMain:
             handle_excel.writeData(i+2,col_result,"",index)# 初始化，将上次执行结果删除
             handle_excel.writeData(i+2,col_res,"",index)
             data=handle_excel.getRowValue(i+2,index) # 第一条有效数据实际行数为2，i取值是从0开始的，故使用i+2
-            case_num =data[int(handle_ini.get_value("case_num"))-1]
             depend=data[int(handle_ini.get_value("depend"))-1]
             method=data[int(handle_ini.get_value("method"))-1]
             url=data[int(handle_ini.get_value("url"))-1]
@@ -45,10 +43,10 @@ class RunMain:
                     if re_data=="\\":
                         re_data=None
                     else:
-                        if type(generated_datas(depend,sent_data=re_data))==str:
-                            re_data=bytes(generated_datas(depend,sent_data=re_data).encode('utf-8'))
+                        if type(generated_datas(depend,sent_data=re_data,index=index))==str:
+                            re_data=bytes(generated_datas(depend,sent_data=re_data,index=index).encode('utf-8'))
                         else:
-                            re_data =json.dumps(generated_datas(depend,sent_data=re_data))
+                            re_data =json.dumps(generated_datas(depend,sent_data=re_data,index=index))
                 if token_operate == "with_token":
                     if header==None:
                         header = updata_header(header)
@@ -125,7 +123,6 @@ class RunMain:
                             handle_excel.writeData(i + 2, col_result, "fail", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 else:
-                    print(header)
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
                     print(res)

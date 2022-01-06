@@ -7,7 +7,6 @@ import datetime
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
-from util.condition_data import generated_data
 from util.condition_data import generated_datas
 from util.handle_header import write_token
 from util.handle_header import updata_header
@@ -57,16 +56,16 @@ class TestRunCaseDdt(unittest.TestCase):
                 if depend!=None:
                     if re_data=="\\":
                         re_data=None
-                    if depend != None:
-                        if depend.find(",") == -1:
-                            re_data = generated_data(depend,re_data)
+                    else:
+                        if type(generated_datas(depend, sent_data=re_data,index=index)) == str:
+                            re_data = bytes(generated_datas(depend, sent_data=re_data,index=index).encode('utf-8'))
                         else:
-                            re_data = generated_datas(depend,re_data)
+                            re_data = json.dumps(generated_datas(depend, sent_data=re_data,index=index))
                 if token_operate == "with_token":
                     if header == None:
                         header = updata_header()
                     else:
-                        header = updata_header(header)
+                        header = updata_header(eval(header))
                     res = base_request.run_main( method, index, url, re_data, header)
                     code = res["code"]
                     msg = res["msg"]
@@ -102,7 +101,6 @@ class TestRunCaseDdt(unittest.TestCase):
                 elif token_operate == "write_token":
                     header = eval(header)
                     res = base_request.run_main(method,index,url,re_data,header)
-                    print(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
