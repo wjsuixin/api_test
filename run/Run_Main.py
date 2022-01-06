@@ -27,7 +27,6 @@ class RunMain:
             handle_excel.writeData(i+2,col_res,"",index)
             data=handle_excel.getRowValue(i+2,index) # 第一条有效数据实际行数为2，i取值是从0开始的，故使用i+2
             case_num =data[int(handle_ini.get_value("case_num"))-1]
-            print(case_num)
             depend=data[int(handle_ini.get_value("depend"))-1]
             method=data[int(handle_ini.get_value("method"))-1]
             url=data[int(handle_ini.get_value("url"))-1]
@@ -43,16 +42,13 @@ class RunMain:
                 if header=="\\":
                     header=None
                 if depend!=None:
-                    sql=handle_yaml.get_data("yanxue_ERP","/config/depend_sql.yaml")[case_num]
-                    print(sql)
                     if re_data=="\\":
                         re_data=None
                     else:
-                        if type(generated_datas(depend,sent_data=re_data,sql=sql))==str:
-                            re_data=bytes(generated_datas(depend,sent_data=re_data,sql=sql).encode('utf-8'))
+                        if type(generated_datas(depend,sent_data=re_data))==str:
+                            re_data=bytes(generated_datas(depend,sent_data=re_data).encode('utf-8'))
                         else:
-                            re_data = generated_datas(depend, sent_data=re_data, sql=sql)
-                    print(re_data)
+                            re_data =json.dumps(generated_datas(depend,sent_data=re_data))
                 if token_operate == "with_token":
                     if header==None:
                         header = updata_header(header)

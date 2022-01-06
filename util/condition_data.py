@@ -1,12 +1,12 @@
 #encoding=utf-8
 import json
 import sys,os
-import jsonpath
 import random
 from util.handle_excel import handle_excel
 from jsonpath_rw import parse
 from util.handle_ini import handle_ini
 from util.handle_sql import HandleSQl
+from util.handle_yaml import handle_yaml
 base_path=os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_path)
 
@@ -23,7 +23,19 @@ def split_data(data):
         replace_value =None
     return case_num,rule_data,replace_value
 
-def depend_data(data,sql=None):
+def depend_type(data):
+    """
+    判断数据的依赖类型
+    """
+    if split_data(data)[0].find("sql#")!=-1:
+        return "sql"
+    elif split_data(data)[0].find("case_") != -1:
+        return "case"
+    else:
+        print("请检查数据依赖类型的正确性")
+
+
+def depend_data(data):
     """
     获取到所依赖数据集合,返回case_num对应接口返回的数据
     """
@@ -35,10 +47,13 @@ def depend_data(data,sql=None):
         #print("根据依赖case_num:{},获取到的依赖case返回数据：{}".format(case_num,handle_excel.getCellValue(row,col_res)))
         return handle_excel.getCellValue(row,col_res)
     else:
-        depend_database=split_data(data)[0].split("#")[1]
+        depend_database=split_data(data)[0].split("#")[1].split("+")[0]
+        sql_case=split_data(data)[0].split("#")[1].split("+")[1]
+        sheet=handle_excel.get_sheet_names()[int(handle_ini.get_value("index","SheetIndex"))]
+        sql_result=handle_yaml.get_data(sheet,"/config/depend_sql.yaml")[sql_case]
         depend_type=split_data(data)[0].split("#")[0]
-        if depend_type=="sql" and sql!=None:
-            return random.choice(HandleSQl(depend_database).query(sql))
+        if depend_type=="sql" and sql_result!=None:
+            return random.choice(HandleSQl(depend_database).query(sql_result))
         else:
             print("sql依赖的case,请检查依赖数据是否正确或者sql语句是否传递！")
 
@@ -75,10 +90,11 @@ def split_key(data):
         routine_list.append(rule_data)
     return routine_list[-1]
 
-def generated_datas(data,sql=None,sent_data=None):
+def generated_datas(data,sent_data=None):
     """
     将取到的依赖数据循环合成新的数据，进行传输
     """
+    print(data.find("&"))
     if data.find("&")==-1: # 判断是否是多数据依赖
         if split_data(data)[0].find("sql#") == -1:  # 判断是否是case依赖
             if sent_data == None:
@@ -95,7 +111,7 @@ def generated_datas(data,sql=None,sent_data=None):
                     else:
                         print("用例依赖替换值与参数中的替换值不一致或参数中替换值缺失，请检查！")
         else:
-            old_data = depend_data(data, sql)
+            old_data = depend_data(data)
             depend = eval(split_data(data)[1])
             for key1, value in depend.items():
                 for key2 in old_data.keys():
@@ -108,6 +124,8 @@ def generated_datas(data,sql=None,sent_data=None):
                     print("参数为空，此时无法替换依赖值！")
             else:
                 if split_data(data)[2] == None:
+                    print(eval(sent_data), type(eval(sent_data)))
+                    print(depend,type(depend))
                     sent_data = dict(eval(sent_data), **depend)
                 else:
                     if sent_data.find(split_data(data)[2]) != -1:
@@ -117,6 +135,7 @@ def generated_datas(data,sql=None,sent_data=None):
     else:
         for i in data.split("&"):
             if split_data(i)[0].find("sql#") == -1:  # 判断是否是case依赖
+                print(split_data(i)[0].find("sql#"))
                 if sent_data == None:
                     print("传递参数为空，依赖值无可替换的key,请检查！")
                 else:
@@ -131,8 +150,10 @@ def generated_datas(data,sql=None,sent_data=None):
                         else:
                             print("用例依赖替换值与参数中的替换值不一致或参数中替换值缺失，请检查！")
             else:
-                old_data = depend_data(i, sql)
+                old_data = depend_data(i)
                 depend = eval(split_data(i)[1])
+                print(old_data)
+                print(depend)
                 for key1, value in depend.items():
                     for key2 in old_data.keys():
                         if depend[key1] == key2:
@@ -144,6 +165,8 @@ def generated_datas(data,sql=None,sent_data=None):
                         print("参数为空，此时无法替换依赖值！")
                 else:
                     if split_data(data)[2] == None:
+                        print(eval(sent_data), type(eval(sent_data)))
+                        print(depend, type(depend))
                         sent_data = dict(eval(sent_data), **depend)
                     else:
                         if sent_data.find(split_data(i)[2]) != -1:
@@ -167,7 +190,7 @@ if __name__ == '__main__':
     depend_data(data)
     #print(type(json.loads(depend_data(data))))
     #print(jsonpath.jsonpath(json.loads(depend_data(data)),"$.data.token"))
-    data6='sql#yanxue_common_fat>{"supplierId":"id","supplierName":"name"}@#name1#'
+    data6='sql#yanxue_common_fat+case_004>{"supplierId":"id","supplierName":"name"}@#name1#'
     sql = "SELECT id,name FROM `yx_common_fat`.`supplier` WHERE `audit_status` = '3' AND `enable_status` LIKE '%1%' LIMIT 0,1000"
 
     #print(depend_data(data6,sql))
@@ -180,8 +203,9 @@ if __name__ == '__main__':
     data91 = "case_001>data.name"
     #print(depend_data(data2,sql=sql))
     #print(get_data(data9))
-    print(generated_datas(data9,sent_data=data8,sql=sql))
+    #print(generated_datas(data9,sent_data=data8,sql=sql))
     #print(data8.replace(split_data(data9)[2], get_data(data9)))
+    print(depend_data(data6))
 
 
 
