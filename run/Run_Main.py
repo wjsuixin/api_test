@@ -34,6 +34,7 @@ class RunMain:
             token_operate=data[int(handle_ini.get_value("token_operate"))-1]
             expected_method=data[int(handle_ini.get_value("expected_method"))-1]
             expected_result=str(data[int(handle_ini.get_value("expected_result"))-1])
+            mock_data=str(data[int(handle_ini.get_value("mock_data"))-1])
             if is_run=="yes" or is_run=="Yes":
                 if depend=="否":
                     depend=None
@@ -52,7 +53,10 @@ class RunMain:
                         header = updata_header(header)
                     else:
                         header = updata_header(eval(header))
-                    res=base_request.run_main(method,index,url,re_data,header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res=base_request.run_main(method,index,url,re_data,header)
                     print(res)
                     code = res["code"]
                     msg = res["msg"]
@@ -87,7 +91,10 @@ class RunMain:
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 elif token_operate=="write_token":
                     header=eval(header)
-                    res = base_request.run_main(method,index,url,re_data,header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res = base_request.run_main(method,index,url,re_data,header)
                     print(res)
                     code = res["code"]
                     msg = res["msg"]
@@ -124,7 +131,10 @@ class RunMain:
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 else:
                     header = eval(header)
-                    res = base_request.run_main(method,index,url,re_data,header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res = base_request.run_main(method,index,url,re_data,header)
                     print(res)
                     code = res["code"]
                     msg = res["msg"]

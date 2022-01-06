@@ -19,8 +19,8 @@ sys.path.append(base_path)
 index = int(handle_ini.get_value("index", "SheetIndex"))
 request_data = []
 for n in handle_excel.getExcelData(index):
-    n[-1]=None
     n[-2]=None
+    n[-3]=None
     request_data.append(n)
 
 @ddt.ddt
@@ -43,6 +43,7 @@ class TestRunCaseDdt(unittest.TestCase):
         token_operate = request_data[int(handle_ini.get_value("token_operate"))-1]
         expected_method = request_data[int(handle_ini.get_value("expected_method"))-1]
         expected_result = str(request_data[int(handle_ini.get_value("expected_result"))-1])
+        mock_data = str(request_data[int(handle_ini.get_value("mock_data"))-1])
         col_result = int(handle_ini.get_value("result"))
         col_res = int(handle_ini.get_value("response"))
         i = handle_excel.getRowsNumber(case_num,index)
@@ -66,7 +67,10 @@ class TestRunCaseDdt(unittest.TestCase):
                         header = updata_header()
                     else:
                         header = updata_header(eval(header))
-                    res = base_request.run_main( method, index, url, re_data, header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res = base_request.run_main( method, index, url, re_data, header)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
@@ -100,7 +104,10 @@ class TestRunCaseDdt(unittest.TestCase):
                             raise e
                 elif token_operate == "write_token":
                     header = eval(header)
-                    res = base_request.run_main(method,index,url,re_data,header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res = base_request.run_main(method,index,url,re_data,header)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
@@ -137,7 +144,10 @@ class TestRunCaseDdt(unittest.TestCase):
                             raise e
                 else:
                     header = eval(header)
-                    res = base_request.run_main(method,index,url,re_data,header)
+                    if method.find("mock_")!=-1:
+                        res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
+                    else:
+                        res = base_request.run_main(method,index,url,re_data,header)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":

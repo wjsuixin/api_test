@@ -2,6 +2,7 @@ import sys
 import requests
 import json
 import os
+from unittest import mock
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -60,6 +61,25 @@ class BaseRequest:
             print("这个是text")
         return res
 
+    def mock_request(self,mock_method,method,url,request_data,header,mock_data):
+        """
+        mock接口测试
+        """
+        mock_method=mock.Mock(return_value=mock_data)
+        if method=="mock_post":
+            res=mock_method(self.run_main,"post",url,request_data,header)
+        elif method=="mock_get":
+            res = mock_method(self.run_main, "get", url, request_data, header)
+        else:
+            res=mock_method(self.run_main, "updata_post", url, request_data, header)
+        try:
+            res = json.loads(res)
+            # print(type(res))
+        except:
+            print("这个是text")
+        return res
+
+
 base_request=BaseRequest()
 
 if __name__ == '__main__':
@@ -79,4 +99,13 @@ if __name__ == '__main__':
     res1=requests.post(url=url1,files=file,headers=header1,verify=False)
     print(res1.text)
     """
-    base_request.get_base_url(1)
+    #base_request.get_base_url(1)
+    url = "auth/login"
+    data = {"username": "wj@qq.com", "password": "yx1234"}
+    header = {"content-type": "application/json;charset=UTF-8"}
+    mock_data = {"ID": 1, "name": "wujiang"}
+    print(base_request.get_base_url(1))
+    t1 = base_request.run_main("post",1, url,json.dumps(data), header)
+    print(t1)
+    t = base_request.mock_request(base_request.run_main, "post", url, json.dumps(data), header, mock_data)
+    print(t)
