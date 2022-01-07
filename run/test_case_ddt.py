@@ -4,6 +4,7 @@ import ddt
 import unittest
 import os,sys
 import datetime
+import HTMLTestRunnerCN
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
@@ -11,8 +12,10 @@ from util.condition_data import generated_datas
 from util.handle_header import write_token
 from util.handle_header import updata_header
 from BeautifulReport import BeautifulReport
+from HTMLTestRunner import HTMLTestRunner
 from util.handle_result_json import handle_result_json
 from util.handle_random import handle_random
+from util.email_psot import send_email
 base_path=os.path.dirname(os.path.dirname(__file__))
 
 sys.path.append(base_path)
@@ -186,8 +189,20 @@ class TestRunCaseDdt(unittest.TestCase):
 if __name__ == '__main__':
     base_path = os.path.dirname(os.path.dirname(__file__)).replace('\\', '/')
     case_path=base_path+"/run"
-    report_path=base_path+"/report"
+    #report_path=base_path+"/report"
+    suit = unittest.TestSuite()
     discover = unittest.defaultTestLoader.discover(case_path, pattern='test*.py')
-    now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
-    filename = 'yohitrip interface_' + str(now)
-    BeautifulReport(discover).report(description='yohitrip interface test', filename=filename, report_dir=report_path)
+    now = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
+    filename = handle_ini.get_value("filename","report") + str(now)
+    report_path = base_path + f"/report/{filename}.html"
+    #BeautifulReport(discover).report(description='yohitrip interface test', filename=filename, report_dir=report_path)
+    f=open(report_path,"wb")
+    #runner=HTMLTestRunner(stream=f,title="YANXUE_erp V1.00 API Test",description="测试描述")
+    runner=HTMLTestRunnerCN.HTMLTestReportCN(stream=f,
+                                             title=handle_ini.get_value("title","report"),
+                                             description=handle_ini.get_value("description","report"),
+                                             tester=handle_ini.get_value("tester","report"))
+    runner.run(discover)
+    f.close()
+    new_report=send_email.acquire_report_address(base_path + "/report/")
+    send_email.send_email(new_report)
