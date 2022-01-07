@@ -6,6 +6,7 @@ from util.handle_ini import handle_ini
 from util.condition_data import generated_datas
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
+from util.handle_random import handle_random
 base_path=os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_path)
 
@@ -36,18 +37,16 @@ class RunMain:
             expected_result=str(data[int(handle_ini.get_value("expected_result"))-1])
             mock_data=str(data[int(handle_ini.get_value("mock_data"))-1])
             if is_run=="yes" or is_run=="Yes":
-                if depend=="否":
-                    depend=None
-                if header=="\\":
-                    header=None
-                if depend!=None:
+                if re_data.find("faker.") != -1:
+                    re_data = handle_random.data_replace(re_data)
+                if depend!=None and "否" and "\\":
                     if re_data=="\\":
                         re_data=None
-                    else:
-                        if type(generated_datas(depend,sent_data=re_data,index=index))==str:
-                            re_data=bytes(generated_datas(depend,sent_data=re_data,index=index).encode('utf-8'))
-                        else:
-                            re_data =json.dumps(generated_datas(depend,sent_data=re_data,index=index))
+                    re_data=generated_datas(depend,sent_data=re_data,index=index)
+                if type(re_data) == str:
+                    re_data = bytes(re_data.encode('utf-8'))
+                else:
+                    re_data = json.dumps(re_data)
                 if token_operate == "with_token":
                     if header==None:
                         header = updata_header(header)
