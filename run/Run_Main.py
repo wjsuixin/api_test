@@ -3,13 +3,15 @@ import json,os,sys
 from base.base_request import base_request
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
-from util.condition_data import generated_datas
+from util.condition_data import handle_condition_data
 from util.handle_header import write_token,updata_header
 from util.handle_result_json import handle_result_json
 from util.handle_random import handle_random
+from util.handle_log import Logger
 base_path=os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_path)
-
+# 创建一个日志实例
+logger = Logger(logger="RunMain").getlog()
 class RunMain:
     """
     执行case的类
@@ -42,7 +44,7 @@ class RunMain:
                 if depend!=None and "否" and "\\":
                     if re_data=="\\":
                         re_data=None
-                    re_data=generated_datas(depend,sent_data=re_data,index=index)
+                    re_data=handle_condition_data.generated_datas(depend,sent_data=re_data,index=index)
                 if type(re_data) == str:
                     re_data = bytes(re_data.encode('utf-8'))
                 else:
@@ -56,36 +58,36 @@ class RunMain:
                         res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
                     else:
                         res=base_request.run_main(method,index,url,re_data,header)
-                    print(res)
+                    logger.info(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
                         if code == expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method == "msg":
                         if msg == expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method == "json":
                         expected_result = json.loads(expected_result)
                         result=handle_result_json(res,expected_result)
                         if result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i + 2, col_result, "pass", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i + 2, col_result, "fail", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 elif token_operate=="write_token":
@@ -94,38 +96,39 @@ class RunMain:
                         res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
                     else:
                         res = base_request.run_main(method,index,url,re_data,header)
-                    print(res)
+                    logger.info(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method == "code":
                         if code == expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             write_token(res)
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method == "msg":
                         if msg == expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             write_token(res)
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method == "json":
                         expected_result = json.loads(expected_result)
                         result=handle_result_json(res,expected_result)
                         if result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            write_token(res)
                             handle_excel.writeData(i + 2, col_result, "pass", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i + 2, col_result, "fail", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                 else:
@@ -134,36 +137,36 @@ class RunMain:
                         res=base_request.mock_request(base_request.run_main,method,url,re_data,header,mock_data)
                     else:
                         res = base_request.run_main(method,index,url,re_data,header)
-                    print(res)
+                    logger.info(res)
                     code = res["code"]
                     msg = res["msg"]
                     if expected_method=="code":
                         if code==expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method=="msg":
                         if msg==expected_result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i+2,col_result,"pass",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i+2,col_result,"fail",index)
                             handle_excel.writeData(i+2,col_res,json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False),index)
                     if expected_method == "json":
                         expected_result = json.loads(expected_result)
                         result=handle_result_json(res,expected_result)
                         if result:
-                            print("预期校验方式的结果与实际结果一致,该用例测试通过")
+                            logger.info("预期校验方式的结果与实际结果一致,该用例测试通过")
                             handle_excel.writeData(i + 2, col_result, "pass", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
                         else:
-                            print("预期校验方式的结果与实际结果不一致,该用例执行失败")
+                            logger.info("预期校验方式的结果与实际结果不一致,该用例执行失败")
                             handle_excel.writeData(i + 2, col_result, "fail", index)
                             handle_excel.writeData(i + 2, col_res, json.dumps(res,indent=4,sort_keys=True,ensure_ascii=False), index)
 

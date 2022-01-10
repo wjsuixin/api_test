@@ -1,12 +1,13 @@
 import openpyxl
 import os,json,sys
 import datetime
+from util.handle_log import Logger
 base_path=os.path.dirname(os.path.dirname(__file__))
 file_path = base_path+"/data/Test_case.xlsx"
 now = datetime.datetime.now().strftime('%Y-%m-%d %H_%M_%S')
 new_file_path=base_path+"\report\%s.xlsx" % now
-
 sys.path.append(base_path)
+logger=Logger(logger="HandleExcel").getlog()
 
 class HandleExcel():
     """

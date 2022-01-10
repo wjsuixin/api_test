@@ -5,11 +5,12 @@ import os
 from unittest import mock
 from util.handle_excel import handle_excel
 from util.handle_ini import handle_ini
+from util.handle_log import Logger
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 base_path=os.path.dirname(os.path.dirname(__file__))
-
 sys.path.append(base_path)
+logger=Logger(logger="RunMain").getlog()
 
 class BaseRequest:
 
@@ -58,7 +59,7 @@ class BaseRequest:
             res=json.loads(res)
             #print(type(res))
         except:
-            print("这个是text")
+            logger.info("该返回数据是text")
         return res
 
     def mock_request(self,mock_method,method,url,request_data,header,mock_data):
@@ -76,7 +77,7 @@ class BaseRequest:
             res = json.loads(res)
             # print(type(res))
         except:
-            print("这个是text")
+            logger.info("该返回数据是text")
         return res
 
 
