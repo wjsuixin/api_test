@@ -1,0 +1,2 @@
+yanxue_ERP:
+  case_004: SELECT id,name FROM `yx_common_fat`.`supplier` WHERE `audit_status` = '3' AND `enable_status`='1'
